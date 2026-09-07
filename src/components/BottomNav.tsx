@@ -27,28 +27,28 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   }[] = [
     {
       id: 'strategy',
-      label: 'Strategy',
-      stageHint: '1, 2, 8',
+      label: 'Studio',
+      stageHint: '1, 2, 3',
       icon: Brain,
     },
     {
       id: 'drafts',
-      label: 'Posting',
-      stageHint: '3, 4, 5',
+      label: 'Queue',
+      stageHint: '4, 5',
       icon: PenTool,
       badge: pendingDraftCount,
     },
     {
       id: 'triage',
-      label: 'Radar',
-      stageHint: '6, 7',
+      label: 'Engage',
+      stageHint: '6',
       icon: Siren,
       badge: crisisActive,
     },
     {
       id: 'analytics',
       label: 'Signals',
-      stageHint: '9, 10',
+      stageHint: '7, 8',
       icon: BarChart3,
     },
   ];

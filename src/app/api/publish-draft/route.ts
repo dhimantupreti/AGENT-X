@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { AgentOrchestrator } from '@/lib/orchestration/workflow';
 import { XAIClientAdapter } from '@/lib/adapters/xai/client';
 import { MockXClientAdapter } from '@/lib/adapters/x/mock';
-import { BigQueryDataLayer } from '@/lib/gcp/bigquery';
+import { bigQueryTelemetryProvider } from '@/lib/gcp/bigquery';
 import { PostDraft, PersonaConfig, CrisisState, TweetEvent } from '@/core/types';
 
 export async function POST(req: Request) {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
       draft
     );
 
-    // Stream telemetry to BigQuery Data Layer
+    // Best-effort, non-blocking telemetry stream to BigQuery
     if (result.tweetId) {
       const tweetEvent: TweetEvent = {
         tweetId: result.tweetId,
@@ -35,6 +35,11 @@ export async function POST(req: Request) {
         pillarId: updatedDraft.pillarId,
         personaVersion: persona.version,
         draftId: updatedDraft.id,
+        hookArchetype: updatedDraft.selectedHookArchetype,
+        hookId: updatedDraft.selectedHookId,
+        format: updatedDraft.thread && updatedDraft.thread.length > 0 ? 'THREAD' : 'SINGLE_TWEET',
+        threadLength: updatedDraft.thread ? updatedDraft.thread.length : 0,
+        estimatedHookScore: updatedDraft.estimatedHookScore,
         createdAt: new Date().toISOString(),
         metrics: {
           impressions: 1,
@@ -48,7 +53,7 @@ export async function POST(req: Request) {
           updatedAt: new Date().toISOString(),
         },
       };
-      await BigQueryDataLayer.logTweetEvent(tweetEvent);
+      await bigQueryTelemetryProvider.recordTweetEvent(tweetEvent);
     }
 
     return NextResponse.json({ success: true, draft: updatedDraft, result });

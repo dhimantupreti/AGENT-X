@@ -6,6 +6,7 @@ export interface PersonaVersionRecord {
   config: PersonaConfig;
   signalId?: string;
   evolutionSummary: string;
+  proposalSnapshot?: EvolutionSignal; // Audit snapshot rule: exact proposal payload & evidence snapshot
   timestamp: string;
 }
 
@@ -54,8 +55,31 @@ export class SafeEvolutionManager {
           new Set([...next.tone.styleTags, ...styleAdditions])
         );
       } else if (field === 'pillars') {
-        // Safe adjustment to pillar descriptions / hooks
-        next.evolutionNotes = `Evolution v${next.version}: Pillar updated via signal ${signal.type}. Rationale: ${rationale}`;
+        // Safe adjustment to pillar weights
+        if (Array.isArray(proposedValue)) {
+          for (const item of proposedValue) {
+            if (typeof item === 'object' && item !== null && 'id' in item && 'weight' in item) {
+              const target = next.pillars.find((p) => p.id === (item as { id: string; weight: number }).id);
+              if (target) target.weight = Number((item as { id: string; weight: number }).weight);
+            } else if (typeof item === 'string') {
+              // Parse string format: "Pillar Name: 40%" or "pillar_id: 40%"
+              const match = item.match(/^(.*?):\s*(\d+)%?$/);
+              if (match) {
+                const identifier = match[1].trim();
+                const weight = parseInt(match[2], 10);
+                const target = next.pillars.find(
+                  (p) => p.name.toLowerCase() === identifier.toLowerCase() || p.id === identifier
+                );
+                if (target) target.weight = weight;
+              }
+            }
+          }
+          const totalWeight = next.pillars.reduce((sum, p) => sum + p.weight, 0);
+          if (totalWeight !== 100) {
+            throw new Error(`Pillar weights must sum strictly to 100% (currently ${totalWeight}%)`);
+          }
+        }
+        next.evolutionNotes = `Evolution v${next.version}: Pillar weights updated via signal ${signal.type}. Rationale: ${rationale}`;
       }
 
       signal.approvedBy = 'CREATOR';
@@ -65,13 +89,14 @@ export class SafeEvolutionManager {
       // Enforce strict schema validation before committing change
       const validated = personaConfigSchema.parse(next);
 
-      // Append to immutable history
+      // Append to immutable history with exact proposal payload & evidence snapshot
       const list = this.versionHistory.get(currentPersona.id) || [];
       list.push({
         version: validated.version,
         config: validated,
         signalId: signal.id,
         evolutionSummary: next.evolutionNotes,
+        proposalSnapshot: JSON.parse(JSON.stringify(signal)),
         timestamp: next.updatedAt,
       });
       this.versionHistory.set(currentPersona.id, list);

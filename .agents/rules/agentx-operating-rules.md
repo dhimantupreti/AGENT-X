@@ -1,13 +1,3 @@
-<!-- BEGIN:nextjs-agent-rules -->
-
-# This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
-
 # AGENTX Repository Operating Rules & Policy-Safe Protocol
 
 For any non-trivial task in this repository, the AI agent MUST strictly follow this execution order:
@@ -27,4 +17,3 @@ For any non-trivial task in this repository, the AI agent MUST strictly follow t
 - **Approval-Gated Sensitive Actions**: For AGENTX, sensitive user-facing actions (publishing to X, sending mention replies, applying persona evolution diffs, or crisis state overrides) must remain strictly human-approval-gated unless the user explicitly approves otherwise.
 - **Data Agent Kit Boundaries**: Leverage Google Cloud Data Agent Kit strictly for analytics, data modeling (BigQuery schemas, table DDLs, analytical SQL views), and data pipeline planning. Do NOT use Data Agent Kit for unrelated UI tasks or arbitrary frontend complexity.
 - **Preserve Architectural Stability**: Keep changes minimal, deliberate, maintainable, and strongly typed. Never replace stable, working architecture unnecessarily.
-

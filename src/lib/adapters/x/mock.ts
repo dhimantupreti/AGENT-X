@@ -31,6 +31,17 @@ export class MockXClientAdapter implements IXClientAdapter {
     };
   }
 
+  async sendReply(mentionId: string, replyText: string): Promise<PublishResult> {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const tweetId = `mock_reply_${Date.now()}`;
+    return {
+      success: true,
+      tweetId,
+      url: `https://x.com/mock_user/status/${tweetId}`,
+      rateLimitRemaining: 95,
+    };
+  }
+
   async fetchRecentMetrics(tweetIds: string[]): Promise<Map<string, TweetMetrics>> {
     const results = new Map<string, TweetMetrics>();
 

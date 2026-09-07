@@ -6,20 +6,21 @@ import { envSchema, AppEnv } from '@/core/schemas';
 export function getAppConfig(): AppEnv {
   const result = envSchema.safeParse({
     NODE_ENV: process.env.NODE_ENV,
-    XAI_API_KEY: process.env.XAI_API_KEY,
-    XAI_BASE_URL: process.env.XAI_BASE_URL,
-    XAI_MODEL: process.env.XAI_MODEL,
-    X_API_KEY: process.env.X_API_KEY,
-    X_API_KEY_SECRET: process.env.X_API_KEY_SECRET,
-    X_ACCESS_TOKEN: process.env.X_ACCESS_TOKEN,
-    X_ACCESS_TOKEN_SECRET: process.env.X_ACCESS_TOKEN_SECRET,
-    X_CLIENT_ID: process.env.X_CLIENT_ID,
-    X_CLIENT_SECRET: process.env.X_CLIENT_SECRET,
-    GCP_PROJECT_ID: process.env.GCP_PROJECT_ID,
-    GCP_CLIENT_EMAIL: process.env.GCP_CLIENT_EMAIL,
-    GCP_PRIVATE_KEY: process.env.GCP_PRIVATE_KEY,
-    BIGQUERY_DATASET: process.env.BIGQUERY_DATASET,
-    BIGQUERY_LOCATION: process.env.BIGQUERY_LOCATION,
+    XAI_API_KEY: process.env.XAI_API_KEY?.trim(),
+    XAI_BASE_URL: process.env.XAI_BASE_URL?.trim(),
+    XAI_MODEL: process.env.XAI_MODEL?.trim(),
+    XAI_TIMEOUT_MS: process.env.XAI_TIMEOUT_MS,
+    X_API_KEY: process.env.X_API_KEY?.trim(),
+    X_API_KEY_SECRET: process.env.X_API_KEY_SECRET?.trim(),
+    X_ACCESS_TOKEN: process.env.X_ACCESS_TOKEN?.trim(),
+    X_ACCESS_TOKEN_SECRET: process.env.X_ACCESS_TOKEN_SECRET?.trim(),
+    X_CLIENT_ID: process.env.X_CLIENT_ID?.trim(),
+    X_CLIENT_SECRET: process.env.X_CLIENT_SECRET?.trim(),
+    GCP_PROJECT_ID: process.env.GCP_PROJECT_ID?.trim(),
+    GCP_CLIENT_EMAIL: process.env.GCP_CLIENT_EMAIL?.trim(),
+    GCP_PRIVATE_KEY: process.env.GCP_PRIVATE_KEY?.trim(),
+    BIGQUERY_DATASET: process.env.BIGQUERY_DATASET?.trim(),
+    BIGQUERY_LOCATION: process.env.BIGQUERY_LOCATION?.trim(),
   });
 
   if (!result.success) {
@@ -27,7 +28,8 @@ export function getAppConfig(): AppEnv {
     return {
       NODE_ENV: 'development',
       XAI_BASE_URL: 'https://api.x.ai/v1',
-      XAI_MODEL: 'grok-beta',
+      XAI_MODEL: 'grok-3-mini',
+      XAI_TIMEOUT_MS: 8000,
       BIGQUERY_DATASET: 'agentx_analytics',
       BIGQUERY_LOCATION: 'US',
     };

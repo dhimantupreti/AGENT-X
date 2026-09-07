@@ -1,4 +1,11 @@
-import { ComplianceReport, ComplianceViolation, PostDraft, PersonaConfig, CrisisState } from '@/core/types';
+import {
+  ComplianceReport,
+  ComplianceViolation,
+  PostDraft,
+  PersonaConfig,
+  CrisisState,
+  CrisisRiskAssessment,
+} from '@/core/types';
 
 export class ComplianceEngine {
   /**
@@ -7,7 +14,8 @@ export class ComplianceEngine {
   public static evaluateDraft(
     draft: Partial<PostDraft>,
     persona: PersonaConfig,
-    crisisState?: CrisisState
+    crisisState?: CrisisState,
+    aiRisk?: CrisisRiskAssessment
   ): ComplianceReport {
     const violations: ComplianceViolation[] = [];
     let score = 100;
@@ -112,6 +120,99 @@ export class ComplianceEngine {
       }
     });
 
+    // 7. AI-Powered Crisis Risk & Sentiment Analysis Integration
+    if (aiRisk) {
+      const allText = allTweets.join(' ');
+      const riskContext = `${aiRisk.reason} ${aiRisk.recommendation} ${allText}`;
+
+      // 7a. Brand Liability
+      if (aiRisk.brandLiability === 'HIGH') {
+        violations.push({
+          ruleId: 'AI_HIGH_BRAND_LIABILITY',
+          severity: 'CRITICAL',
+          category: 'BRAND_SAFETY',
+          message: `AI Sentinel flagged HIGH Brand Liability: ${aiRisk.reason}`,
+          suggestion: aiRisk.recommendation || 'Remove unsubstantiated claims, guarantees, or potential legal exposure.',
+        });
+        score -= 30;
+      } else if (aiRisk.brandLiability === 'MEDIUM') {
+        violations.push({
+          ruleId: 'AI_MEDIUM_BRAND_LIABILITY',
+          severity: 'WARNING',
+          category: 'BRAND_SAFETY',
+          message: `AI Sentinel flagged Moderate Brand Liability: ${aiRisk.reason}`,
+          suggestion: aiRisk.recommendation || 'Review claims to ensure defensibility.',
+        });
+        score -= 10;
+      }
+
+      // 7b. Tone Toxicity
+      if (aiRisk.toneToxicity === 'HIGH') {
+        const isExplicitAbuse = /\b(harass|threat|slur|abuse|hate\s+speech|kill|violence|doxx)\b/i.test(riskContext);
+        if (isExplicitAbuse) {
+          violations.push({
+            ruleId: 'AI_CRITICAL_TOXICITY',
+            severity: 'CRITICAL',
+            category: 'BRAND_SAFETY',
+            message: `AI Sentinel detected severe toxicity, threats, slurs, or explicit abuse: ${aiRisk.reason}`,
+            suggestion: 'Immediately remove abusive or hostile wording to comply with platform policy.',
+          });
+          score -= 35;
+        } else {
+          violations.push({
+            ruleId: 'AI_HIGH_TONE_TOXICITY',
+            severity: 'WARNING',
+            category: 'TONE_DEVIATION',
+            message: `AI Sentinel detected elevated tone toxicity: ${aiRisk.reason}`,
+            suggestion: aiRisk.recommendation || 'Temper confrontational phrasing into constructive commentary.',
+          });
+          score -= 15;
+        }
+      } else if (aiRisk.toneToxicity === 'MEDIUM') {
+        violations.push({
+          ruleId: 'AI_MEDIUM_TONE_TOXICITY',
+          severity: 'WARNING',
+          category: 'TONE_DEVIATION',
+          message: `AI Sentinel detected mildly sharp or aggressive tone: ${aiRisk.reason}`,
+          suggestion: aiRisk.recommendation || 'Ensure tone aligns with persona voice guidelines.',
+        });
+        score -= 10;
+      }
+
+      // 7c. Sarcasm & Ambiguity Risk
+      if (aiRisk.sarcasmAmbiguityRisk === 'HIGH') {
+        violations.push({
+          ruleId: 'AI_HIGH_AMBIGUITY_RISK',
+          severity: 'WARNING',
+          category: 'TONE_DEVIATION',
+          message: `AI Sentinel flagged HIGH Sarcasm / Ambiguity Risk: ${aiRisk.reason}`,
+          suggestion: aiRisk.recommendation || 'Clarify satire or ironic phrasing to prevent audience misinterpretation.',
+        });
+        score -= 10;
+      } else if (aiRisk.sarcasmAmbiguityRisk === 'MEDIUM') {
+        violations.push({
+          ruleId: 'AI_MEDIUM_AMBIGUITY_RISK',
+          severity: 'WARNING',
+          category: 'TONE_DEVIATION',
+          message: 'AI Sentinel flagged Moderate Ambiguity: Satire or irony may be misunderstood.',
+          suggestion: 'Ensure the main takeaway is clearly understandable.',
+        });
+        score -= 5;
+      }
+
+      // 7d. Escalation Required
+      if (aiRisk.escalationRequired) {
+        violations.push({
+          ruleId: 'AI_ESCALATION_REQUIRED',
+          severity: 'CRITICAL',
+          category: 'BRAND_SAFETY',
+          message: `AI Sentinel triggered Mandatory Escalation: ${aiRisk.reason}`,
+          suggestion: 'Creator must explicitly inspect and approve before publishing.',
+        });
+        score -= 25;
+      }
+    }
+
     const normalizedScore = Math.max(0, Math.min(100, score));
     const passed = violations.every((v) => v.severity !== 'CRITICAL') && normalizedScore >= 70;
 
@@ -120,6 +221,7 @@ export class ComplianceEngine {
       score: normalizedScore,
       violations,
       checkedAt: new Date().toISOString(),
+      aiRiskAssessment: aiRisk,
     };
   }
 }

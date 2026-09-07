@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { AgentOrchestrator } from '@/lib/orchestration/workflow';
 import { XAIClientAdapter } from '@/lib/adapters/xai/client';
 import { MockXClientAdapter } from '@/lib/adapters/x/mock';
-import { PersonaConfig, CrisisState } from '@/core/types';
+import { bigQueryTelemetryProvider } from '@/lib/gcp/bigquery';
+import { PersonaConfig, CrisisState, DraftLifecycleEvent } from '@/core/types';
 
 export async function POST(req: Request) {
   try {
@@ -26,6 +27,23 @@ export async function POST(req: Request) {
       pillarId,
       options
     );
+
+    // Best-effort, non-blocking draft lifecycle telemetry to BigQuery
+    const lifecycleEvent: DraftLifecycleEvent = {
+      eventId: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+      draftId: draft.id,
+      authorHandle: persona.handle,
+      eventType: 'DRAFT_CREATED',
+      pillarId: draft.pillarId,
+      initialHookArchetype: draft.selectedHookArchetype,
+      selectedHookArchetype: draft.selectedHookArchetype,
+      initialHookId: draft.selectedHookId,
+      selectedHookId: draft.selectedHookId,
+      format: draft.thread && draft.thread.length > 0 ? 'THREAD' : 'SINGLE_TWEET',
+      isHookSwapped: false,
+      createdAt: new Date().toISOString(),
+    };
+    await bigQueryTelemetryProvider.recordLifecycleEvent(lifecycleEvent);
 
     return NextResponse.json({ success: true, draft });
   } catch (error: unknown) {

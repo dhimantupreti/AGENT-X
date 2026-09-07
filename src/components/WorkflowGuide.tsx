@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, CheckCircle2, ShieldCheck, AlertOctagon, UserCheck, Bot } from 'lucide-react';
+import { X, ShieldCheck, Siren } from 'lucide-react';
 
 interface WorkflowGuideProps {
   isOpen: boolean;
@@ -14,73 +14,67 @@ export const WorkflowGuide: React.FC<WorkflowGuideProps> = ({ isOpen, onClose })
   const steps = [
     {
       step: 1,
-      name: 'Research',
-      mode: 'Autonomous',
-      type: 'bot',
-      desc: 'Monitors solopreneur pain points, niche questions, and audience trends.',
-    },
-    {
-      step: 2,
-      name: 'Strategy',
-      mode: 'Creator Defined',
-      type: 'user',
-      desc: 'Content pillar allocations (e.g. 45% Distribution, 35% Systems, 20% Mindset).',
-    },
-    {
-      step: 3,
-      name: 'Create',
-      mode: 'Autonomous',
-      type: 'bot',
-      desc: 'Drafts high-signal single tweets and threads with virality hook scoring via Grok.',
-    },
-    {
-      step: 4,
-      name: 'Compliance',
-      mode: 'Automated Policy Guard',
-      type: 'shield',
-      desc: 'Scans 280-char limits, banned phrases, hype claims, and crisis freeze status.',
-    },
-    {
-      step: 5,
-      name: 'Posting',
-      mode: 'Human Approval Required',
-      type: 'gate',
-      desc: 'Drafts remain locked until explicitly approved by the creator before sending to X.',
-    },
-    {
-      step: 6,
-      name: 'Engagement',
-      mode: 'Autonomous Triage • Approval to Send',
-      type: 'gate',
-      desc: 'Classifies mentions by sentiment and urgency. Reply proposals require creator sign-off.',
-    },
-    {
-      step: 7,
-      name: 'Crisis',
-      mode: 'Creator Override Kill-Switch',
-      type: 'crisis',
-      desc: '1-tap emergency freeze instantly blocks all scheduled and automated publishing.',
-    },
-    {
-      step: 8,
-      name: 'Persona',
+      workspace: 'Studio',
+      name: 'Persona & Voice Moat',
       mode: 'Creator Voice Moat',
       type: 'user',
       desc: 'Audience targeting, authoritative tone, style tags, and brand safety forbidden lists.',
     },
     {
-      step: 9,
-      name: 'Analytics',
-      mode: 'Autonomous Interpretation',
+      step: 2,
+      workspace: 'Studio',
+      name: 'Content Strategy',
+      mode: 'Creator Defined',
+      type: 'user',
+      desc: 'Strategic content pillar weight distributions (e.g. 45% Scale, 35% Systems, 20% Mindset).',
+    },
+    {
+      step: 3,
+      workspace: 'Studio',
+      name: 'Topic Radar & Quick Notes',
+      mode: 'Autonomous + Ingestion',
+      type: 'bot',
+      desc: 'Monitors solopreneur pain points, niche questions, and refines raw notes into seed angles.',
+    },
+    {
+      step: 4,
+      workspace: 'Queue',
+      name: 'Autonomous Drafter & Hook Lab',
+      mode: 'Autonomous + Hook Lab',
+      type: 'bot',
+      desc: 'Drafts high-signal tweets/threads with 3 distinct virality hook archetypes via Grok.',
+    },
+    {
+      step: 5,
+      workspace: 'Queue',
+      name: 'Posting Gate',
+      mode: 'Human Approval Required',
+      type: 'gate',
+      desc: 'Drafts remain locked until explicitly approved by the creator before publishing to X.',
+    },
+    {
+      step: 6,
+      workspace: 'Engage',
+      name: 'Engagement Triage & Replies',
+      mode: 'Autonomous Triage • Approval to Send',
+      type: 'gate',
+      desc: 'Classifies inbound mentions and drafts tone-matched replies requiring creator sign-off.',
+    },
+    {
+      step: 7,
+      workspace: 'Signals',
+      name: 'Performance Telemetry',
+      mode: 'Autonomous Insights',
       type: 'bot',
       desc: 'BigQuery partitioned telemetry tracking High-Intent Ratios (bookmarks & profile clicks).',
     },
     {
-      step: 10,
-      name: 'Evolution',
+      step: 8,
+      workspace: 'Signals',
+      name: 'Persona Self-Evolution',
       mode: 'Autonomous Proposal • Approval Gate',
       type: 'gate',
-      desc: 'Identifies winning hook patterns and audience fatigue; changes require creator approval.',
+      desc: 'Synthesizes winning hook patterns and pillar balance; mutations require creator approval.',
     },
   ];
 
@@ -89,8 +83,8 @@ export const WorkflowGuide: React.FC<WorkflowGuideProps> = ({ isOpen, onClose })
       <div className="glass-panel w-full max-w-md max-h-[85vh] flex flex-col rounded-t-3xl sm:rounded-3xl border border-white/10 p-5 bg-[#10121d] text-white animate-in slide-in-from-bottom-5 duration-200">
         <div className="flex items-center justify-between border-b border-white/10 pb-3 flex-shrink-0">
           <div>
-            <h3 className="text-sm font-bold text-white">AGENTX 10-Step Product Workflow</h3>
-            <p className="text-[11px] text-gray-400">Policy-Safe Operating Model & Approval Checkpoints</p>
+            <h3 className="text-sm font-bold text-white">AGENTX 8-Stage Creator Operating Flow</h3>
+            <p className="text-[11px] text-gray-400">Policy-Safe Workspaces & Approval Checkpoints</p>
           </div>
           <button
             onClick={onClose}
@@ -106,7 +100,34 @@ export const WorkflowGuide: React.FC<WorkflowGuideProps> = ({ isOpen, onClose })
           Autonomous by default for research, drafting, scoring, and proposals. <span className="font-semibold text-white underline">Human approval required</span> for publishing, sending replies, applying evolutions, and crisis overrides.
         </div>
 
-        {/* 10-Step Scrollable List */}
+        {/* Global Sentinels Card */}
+        <div className="mb-3 rounded-xl bg-black/40 border border-white/10 p-3 space-y-2 flex-shrink-0">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+            Always-On Global System Sentinels
+          </span>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-lg bg-emerald-950/30 border border-emerald-500/30 p-2 space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-emerald-300 text-[11px]">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                <span>Compliance Sentinel</span>
+              </div>
+              <p className="text-[10px] text-gray-400 leading-tight">
+                Automated check for 280 chars, forbidden phrases, hype terms, and freeze status.
+              </p>
+            </div>
+            <div className="rounded-lg bg-red-950/30 border border-red-500/30 p-2 space-y-1">
+              <div className="flex items-center gap-1.5 font-bold text-red-300 text-[11px]">
+                <Siren className="h-3.5 w-3.5 text-red-400" />
+                <span>Crisis Guardian</span>
+              </div>
+              <p className="text-[10px] text-gray-400 leading-tight">
+                1-tap emergency kill-switch instantly halting all publishing and replies.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 8-Stage Scrollable List */}
         <div className="overflow-y-auto space-y-2 pr-1 flex-1">
           {steps.map((item) => (
             <div key={item.step} className="rounded-xl bg-black/30 p-3 border border-white/5 space-y-1">
@@ -115,17 +136,18 @@ export const WorkflowGuide: React.FC<WorkflowGuideProps> = ({ isOpen, onClose })
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-cyan-400 font-mono">
                     {item.step}
                   </span>
-                  <span className="text-xs font-bold text-white">{item.name}</span>
+                  <div>
+                    <span className="text-xs font-bold text-white block">{item.name}</span>
+                    <span className="text-[9px] text-gray-500 font-mono">Workspace: {item.workspace}</span>
+                  </div>
                 </div>
 
                 <span
                   className={`rounded-md px-2 py-0.5 text-[9px] font-bold ${
                     item.type === 'gate'
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      : item.type === 'crisis'
-                      ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                      : item.type === 'shield'
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : item.type === 'user'
+                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                       : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                   }`}
                 >
